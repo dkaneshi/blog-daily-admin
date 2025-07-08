@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateCategoryAction;
+use App\Actions\DeleteCategoryAction;
+use App\Actions\EditCategoryAction;
+use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
@@ -30,11 +35,9 @@ final class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCategoryRequest $request, CreateCategoryAction $action)
     {
-        Category::create([
-            'name' => $request->input('name'),
-        ]);
+        $action->execute($request);
 
         return redirect()->route('categories.index');
     }
@@ -58,11 +61,9 @@ final class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(UpdateCategoryRequest $request, EditCategoryAction $action, Category $category)
     {
-        $category->update([
-            'name' => $request->name,
-        ]);
+        $action->execute($request, $category);
 
         return redirect()->route('categories.index');
     }
@@ -70,9 +71,9 @@ final class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Category $category)
+    public function destroy(DeleteCategoryAction $action, Category $category)
     {
-        $category->delete();
+        $action->execute($category);
 
         return redirect()->route('categories.index');
     }
