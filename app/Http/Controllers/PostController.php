@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreatePostAction;
+use App\Actions\DeletePostAction;
+use App\Actions\EditPostAction;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Category;
@@ -25,9 +28,9 @@ final class PostController extends Controller
         return view('posts.create', compact('categories'));
     }
 
-    public function store(StorePostRequest $request)
+    public function store(StorePostRequest $request, CreatePostAction $action)
     {
-        Post::create($request->validated());
+        $action->execute($request);
 
         return redirect()->route('posts.index');
     }
@@ -44,16 +47,16 @@ final class PostController extends Controller
         return view('posts.edit', compact('post', 'categories'));
     }
 
-    public function update(UpdatePostRequest $request, Post $post)
+    public function update(UpdatePostRequest $request, EditPostAction $action, Post $post)
     {
-        $post->update($request->validated());
+        $action->execute($request, $post);
 
         return redirect()->route('posts.index');
     }
 
-    public function destroy(Post $post)
+    public function destroy(DeletePostAction $action, Post $post)
     {
-        $post->delete();
+        $action->execute($post);
 
         return redirect()->route('posts.index');
     }
