@@ -13,7 +13,7 @@ test('admin can see category list', function () {
     expect($response)->assertStatus(200);
 });
 
-test('user can not see category list', function () {
+test('user cannot see category list', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user);
@@ -73,7 +73,7 @@ test('admin can update category', function () {
     expect($category->name)->toBe('New Category');
 });
 
-test('user can not update category', function () {
+test('user cannot update category', function () {
     $user = User::factory()->create();
 
     $category = Category::factory()->create([
@@ -105,7 +105,7 @@ test('admin can delete category', function () {
 
 });
 
-test('user can not delete category', function () {
+test('user cannot delete category', function () {
     $user = User::factory()->create();
 
     $category = Category::factory()->create();
