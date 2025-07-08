@@ -5,6 +5,12 @@ declare(strict_types=1);
 use App\Models\Category;
 use App\Models\User;
 
+test('unauthenticated users are sent to login screen', function () {
+    $response = $this->get(route('categories.index'));
+
+    expect($response)->assertRedirect(route('login'));
+});
+
 test('admin can see category list', function () {
     $admin = User::factory()->admin()->create();
 
@@ -21,6 +27,27 @@ test('user cannot see category list', function () {
     $this->actingAs($user);
 
     $response = $this->get(route('categories.index'));
+
+    expect($response)->assertStatus(403);
+});
+
+test('admin can see category create form', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin);
+
+    $response = $this->get(route('categories.create'));
+
+    expect($response)->assertOk()
+        ->and($response)->assertViewIs('categories.create');
+});
+
+test('user cannot see category create form', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    $response = $this->get(route('categories.create'));
 
     expect($response)->assertStatus(403);
 });
@@ -54,6 +81,57 @@ test('user cannot create category', function () {
     $category = Category::latest('id')->first();
 
     expect($category)->toBeNull();
+});
+
+test('admin can see category details', function () {
+    $admin = User::factory()->admin()->create();
+
+    $category = Category::factory()->create();
+
+    $this->actingAs($admin);
+
+    $response = $this->get(route('categories.show', $category));
+
+    expect($response)->assertOk()
+        ->and($response)->assertViewHas('category', $category);
+});
+
+test('user cannot see category details', function () {
+    $user = User::factory()->create();
+
+    $category = Category::factory()->create();
+
+    $this->actingAs($user);
+
+    $response = $this->get(route('categories.show', $category));
+
+    expect($response)->assertStatus(403);
+});
+
+test('admin can see category edit form', function () {
+    $admin = User::factory()->admin()->create();
+
+    $category = Category::factory()->create();
+
+    $this->actingAs($admin);
+
+    $response = $this->get(route('categories.edit', $category));
+
+    expect($response)->assertOk()
+        ->and($response)->assertViewIs('categories.edit')
+        ->and($response)->assertViewHas('category', $category);
+});
+
+test('user cannot see category edit form', function () {
+    $user = User::factory()->create();
+
+    $category = Category::factory()->create();
+
+    $this->actingAs($user);
+
+    $response = $this->get(route('categories.edit', $category));
+
+    expect($response)->assertStatus(403);
 });
 
 test('admin can update category', function () {
