@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
-use App\Models\Post;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use App\Models\Post;
 
-class PostController extends Controller
+final class PostController extends Controller
 {
     public function index()
     {
