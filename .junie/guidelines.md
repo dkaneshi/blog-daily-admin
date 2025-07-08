@@ -100,10 +100,10 @@ declare(strict_types=1);
 test('feature description', function () {
     // Arrange
     $user = \App\Models\User::factory()->create();
-    
+
     // Act
     $response = $this->actingAs($user)->get('/');
-    
+
     // Assert
     expect($response)->assertOk();
 });
@@ -161,6 +161,54 @@ The project uses several code quality tools:
 - Controllers follow RESTful conventions
 - Views use Blade templating with Tailwind CSS
 - Frontend uses Alpine.js for JavaScript functionality
+
+### Form Requests for Validation
+The project uses Laravel's Form Request classes for validation:
+
+- Form requests are located in `app/Http/Requests/`
+- Each form request extends `Illuminate\Foundation\Http\FormRequest`
+- Form requests contain two main methods:
+  - `authorize()`: Determines if the user is authorized to make the request
+  - `rules()`: Defines validation rules for the request data
+- Controllers type-hint these request classes for automatic validation
+- Example usage in a controller:
+  ```php
+  public function store(StoreCategoryRequest $request)
+  {
+      // $request is already validated at this point
+      // Access validated data with $request->validated()
+  }
+  ```
+
+### Actions Pattern
+The project follows the Actions pattern for business logic:
+
+- Actions are single-purpose classes located in `app/Actions/`
+- Each action has an `execute()` method that performs a specific operation
+- Actions are injected into controllers via dependency injection
+- Controllers delegate business logic to actions, focusing only on HTTP concerns
+- Example:
+  ```php
+  // Controller
+  public function store(StoreCategoryRequest $request, CreateCategoryAction $action)
+  {
+      $action->execute($request);
+      return redirect()->route('categories.index');
+  }
+
+  // Action
+  public function execute(StoreCategoryRequest $request): void
+  {
+      DB::transaction(function () use ($request) {
+          Category::create($request->validated());
+      });
+  }
+  ```
+- This pattern promotes:
+  - Single Responsibility Principle
+  - Testability (actions can be tested in isolation)
+  - Code reusability (actions can be used in multiple contexts)
+  - Clean controllers focused on HTTP concerns
 
 ### Database
 - The application uses Eloquent ORM
