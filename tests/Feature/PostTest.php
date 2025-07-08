@@ -13,9 +13,9 @@ test('unauthenticated users are sent to login screen', function () {
 });
 
 test('admin can see posts list', function () {
-    $user = User::factory()->admin()->create();
+    $admin = User::factory()->admin()->create();
 
-    $this->actingAs($user);
+    $this->actingAs($admin);
 
     $response = $this->get(route('posts.index'));
 
@@ -33,9 +33,9 @@ test('user cannot see posts list', function () {
 });
 
 test('admin can see post create form', function () {
-    $user = User::factory()->admin()->create();
+    $admin = User::factory()->admin()->create();
 
-    $this->actingAs($user);
+    $this->actingAs($admin);
 
     $response = $this->get(route('posts.create'));
 
@@ -54,11 +54,11 @@ test('user cannot see post create form', function () {
 });
 
 test('admin can create post', function () {
-    $user = User::factory()->admin()->create();
+    $admin = User::factory()->admin()->create();
 
     $category = Category::factory()->create();
 
-    $this->actingAs($user);
+    $this->actingAs($admin);
 
     $response = $this->post(route('posts.store'), [
         'title' => 'Test Post',
@@ -106,6 +106,18 @@ test('admin can see post details', function () {
 
     expect($response)->assertOk()
         ->and($response)->assertViewHas('post', $post);
+});
+
+test('user cannot see post details', function () {
+    $user = User::factory()->create();
+
+    $post = Post::factory()->create();
+
+    $this->actingAs($user);
+
+    $response = $this->get(route('posts.show', $post));
+
+    expect($response)->assertStatus(403);
 });
 
 test('admin can see post edit form', function () {
