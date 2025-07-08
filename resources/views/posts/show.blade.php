@@ -33,6 +33,22 @@
                             <p>{{ $post->category->name }}</p>
                         </div>
                     </div>
+                    <div class="mb-4">
+                        <div>
+                            <h3 class="font-semibold">Created:</h3>
+                        </div>
+                        <div>
+                            <p>{{ \Illuminate\Support\Carbon::parse($post->created_at)->diffForHumans() }}</p>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div>
+                            <h3 class="font-semibold">Updated:</h3>
+                        </div>
+                        <div>
+                            <p>{{ \Illuminate\Support\Carbon::parse($post->updated_at)->diffForHumans() }}</p>
+                        </div>
+                    </div>
                     <div>
                     </div>
                 </div>
