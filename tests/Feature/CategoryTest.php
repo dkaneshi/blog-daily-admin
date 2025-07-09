@@ -83,6 +83,42 @@ test('user cannot create category', function () {
     expect($category)->toBeNull();
 });
 
+test('category name is required', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin);
+
+    $response = $this->post(route('categories.store'), [
+        'name' => '',
+    ]);
+
+    expect($response)->assertSessionHasErrors('name')
+        ->and($response)->assertRedirect();
+
+    $category = Category::latest('id')->first();
+
+    expect($category)->toBeNull();
+});
+
+test('category name cannot exceed 255 characters', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin);
+
+    $tooLongName = str_repeat('a', 256); // 256 characters
+
+    $response = $this->post(route('categories.store'), [
+        'name' => $tooLongName,
+    ]);
+
+    expect($response)->assertSessionHasErrors('name')
+        ->and($response)->assertRedirect();
+
+    $category = Category::latest('id')->first();
+
+    expect($category)->toBeNull();
+});
+
 test('admin can see category details', function () {
     $admin = User::factory()->admin()->create();
 
