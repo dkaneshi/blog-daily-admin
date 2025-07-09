@@ -12,7 +12,7 @@ final class CreatePostAction
 {
     public function execute(StorePostRequest $request): void
     {
-        DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request): void {
             Post::create($request->validated());
         });
     }

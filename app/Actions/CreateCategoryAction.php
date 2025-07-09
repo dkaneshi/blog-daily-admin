@@ -12,7 +12,7 @@ final class CreateCategoryAction
 {
     public function execute(StoreCategoryRequest $request): void
     {
-        DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request): void {
             Category::create($request->validated());
         });
     }

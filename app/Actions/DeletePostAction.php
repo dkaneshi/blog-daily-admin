@@ -11,7 +11,7 @@ final class DeletePostAction
 {
     public function execute(Post $post): void
     {
-        DB::transaction(function () use ($post) {
+        DB::transaction(function () use ($post): void {
             $post->delete();
         });
     }

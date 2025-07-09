@@ -11,7 +11,7 @@ final class DeleteCategoryAction
 {
     public function execute(Category $category): void
     {
-        DB::transaction(function () use ($category) {
+        DB::transaction(function () use ($category): void {
             $category->delete();
         });
     }

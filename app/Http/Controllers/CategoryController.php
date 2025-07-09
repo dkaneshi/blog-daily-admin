@@ -20,7 +20,7 @@ final class CategoryController extends Controller
     {
         $categories = Category::all();
 
-        return view('categories.index', compact('categories'));
+        return view('categories.index', ['categories' => $categories]);
     }
 
     /**
@@ -46,7 +46,7 @@ final class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        return view('categories.show', compact('category'));
+        return view('categories.show', ['category' => $category]);
     }
 
     /**
@@ -54,7 +54,7 @@ final class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        return view('categories.edit', compact('category'));
+        return view('categories.edit', ['category' => $category]);
     }
 
     /**

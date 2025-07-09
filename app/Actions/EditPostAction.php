@@ -12,7 +12,7 @@ final class EditPostAction
 {
     public function execute(UpdatePostRequest $request, Post $post): void
     {
-        DB::transaction(function () use ($request, $post) {
+        DB::transaction(function () use ($request, $post): void {
             $post->update($request->validated());
         });
     }

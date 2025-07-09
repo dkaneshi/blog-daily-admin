@@ -12,7 +12,7 @@ final class EditCategoryAction
 {
     public function execute(UpdateCategoryRequest $request, Category $category): void
     {
-        DB::transaction(function () use ($request, $category) {
+        DB::transaction(function () use ($request, $category): void {
             $category->update($request->validated());
         });
     }
