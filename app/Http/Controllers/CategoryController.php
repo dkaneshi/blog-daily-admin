@@ -10,6 +10,7 @@ use App\Actions\EditCategoryAction;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
+use Illuminate\Database\QueryException;
 
 final class CategoryController extends Controller
 {
@@ -38,7 +39,9 @@ final class CategoryController extends Controller
     {
         $action->execute($request);
 
-        return redirect()->route('categories.index');
+        return redirect()
+            ->route('categories.index')
+            ->with('success', 'Category created successfully.');
     }
 
     /**
@@ -64,7 +67,9 @@ final class CategoryController extends Controller
     {
         $action->execute($request, $category);
 
-        return redirect()->route('categories.index');
+        return redirect()
+            ->route('categories.index')
+            ->with('success', 'Category updated successfully.');
     }
 
     /**
@@ -72,8 +77,22 @@ final class CategoryController extends Controller
      */
     public function destroy(DeleteCategoryAction $action, Category $category)
     {
-        $action->execute($category);
+        try {
+            $action->execute($category);
 
-        return redirect()->route('categories.index');
+            return redirect()
+                ->route('categories.index')
+                ->with('success', 'Category deleted successfully.');
+        } catch (QueryException $e) {
+            if ($e->errorInfo[1] === 1451 ||
+                str_contains($e->getMessage(), 'foreign key constraint fails')
+            ) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'Category cannot be deleted because it has associated posts. Please delete or reassign the posts first.');
+            }
+
+            throw $e;
+        }
     }
 }

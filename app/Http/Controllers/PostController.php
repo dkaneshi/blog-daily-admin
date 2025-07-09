@@ -32,7 +32,9 @@ final class PostController extends Controller
     {
         $action->execute($request);
 
-        return redirect()->route('posts.index');
+        return redirect()
+            ->route('posts.index')
+            ->with('success', 'Post created successfully.');
     }
 
     public function show(Post $post)
@@ -51,13 +53,17 @@ final class PostController extends Controller
     {
         $action->execute($request, $post);
 
-        return redirect()->route('posts.index');
+        return redirect()
+            ->route('posts.index')
+            ->with('success', 'Post updated successfully.');
     }
 
     public function destroy(DeletePostAction $action, Post $post)
     {
         $action->execute($post);
 
-        return redirect()->route('posts.index');
+        return redirect()
+            ->route('posts.index')
+            ->with('success', 'Post deleted successfully.');
     }
 }
