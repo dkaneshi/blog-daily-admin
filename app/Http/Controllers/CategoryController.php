@@ -10,7 +10,6 @@ use App\Actions\EditCategoryAction;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
-use Illuminate\Http\Request;
 
 final class CategoryController extends Controller
 {
