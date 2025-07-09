@@ -26,7 +26,7 @@ final class UpdatePostRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'text' => 'required|string',
-            'category_id' => 'required|integer',
+            'category_id' => 'required|integer|exists:categories,id',
         ];
     }
 }

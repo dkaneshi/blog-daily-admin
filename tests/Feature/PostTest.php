@@ -209,3 +209,224 @@ test('user cannot delete post', function () {
     expect($response)->assertStatus(403)
         ->and($post->fresh())->not()->toBeNull();
 });
+
+test('post title is required', function () {
+    $admin = User::factory()->admin()->create();
+    $category = Category::factory()->create();
+
+    $this->actingAs($admin);
+
+    $response = $this->post(route('posts.store'), [
+        'title' => '',
+        'text' => 'Test Content',
+        'category_id' => $category->id,
+    ]);
+
+    expect($response)->assertSessionHasErrors('title')
+        ->and($response)->assertRedirect();
+
+    $post = Post::latest('id')->first();
+
+    expect($post)->toBeNull();
+});
+
+test('post title cannot exceed 255 characters', function () {
+    $admin = User::factory()->admin()->create();
+    $category = Category::factory()->create();
+
+    $this->actingAs($admin);
+
+    $tooLongTitle = str_repeat('a', 256); // 256 characters
+
+    $response = $this->post(route('posts.store'), [
+        'title' => $tooLongTitle,
+        'text' => 'Test Content',
+        'category_id' => $category->id,
+    ]);
+
+    expect($response)->assertSessionHasErrors('title')
+        ->and($response)->assertRedirect();
+
+    $post = Post::latest('id')->first();
+
+    expect($post)->toBeNull();
+});
+
+test('post text is required', function () {
+    $admin = User::factory()->admin()->create();
+    $category = Category::factory()->create();
+
+    $this->actingAs($admin);
+
+    $response = $this->post(route('posts.store'), [
+        'title' => 'Test Post',
+        'text' => '',
+        'category_id' => $category->id,
+    ]);
+
+    expect($response)->assertSessionHasErrors('text')
+        ->and($response)->assertRedirect();
+
+    $post = Post::latest('id')->first();
+
+    expect($post)->toBeNull();
+});
+
+test('post category_id is required', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin);
+
+    $response = $this->post(route('posts.store'), [
+        'title' => 'Test Post',
+        'text' => 'Test Content',
+        'category_id' => '',
+    ]);
+
+    expect($response)->assertSessionHasErrors('category_id')
+        ->and($response)->assertRedirect();
+
+    $post = Post::latest('id')->first();
+
+    expect($post)->toBeNull();
+});
+
+test('post category_id must be an integer', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin);
+
+    $response = $this->post(route('posts.store'), [
+        'title' => 'Test Post',
+        'text' => 'Test Content',
+        'category_id' => 'not-an-integer',
+    ]);
+
+    expect($response)->assertSessionHasErrors('category_id')
+        ->and($response)->assertRedirect();
+
+    $post = Post::latest('id')->first();
+
+    expect($post)->toBeNull();
+});
+
+test('post category_id must exist in categories table', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin);
+
+    $nonExistentCategoryId = 9999;
+
+    $response = $this->post(route('posts.store'), [
+        'title' => 'Test Post',
+        'text' => 'Test Content',
+        'category_id' => $nonExistentCategoryId,
+    ]);
+
+    expect($response)->assertSessionHasErrors('category_id')
+        ->and($response)->assertRedirect();
+
+    $post = Post::latest('id')->first();
+
+    expect($post)->toBeNull();
+});
+
+test('post update requires title', function () {
+    $admin = User::factory()->admin()->create();
+    $post = Post::factory()->create();
+
+    $this->actingAs($admin);
+
+    $response = $this->patch(route('posts.update', $post), [
+        'title' => '',
+        'text' => 'Updated Content',
+        'category_id' => $post->category_id,
+    ]);
+
+    expect($response)->assertSessionHasErrors('title')
+        ->and($response)->assertRedirect();
+
+    $post->refresh();
+    expect($post->text)->not()->toBe('Updated Content');
+});
+
+test('post update requires text', function () {
+    $admin = User::factory()->admin()->create();
+    $post = Post::factory()->create();
+
+    $this->actingAs($admin);
+
+    $response = $this->patch(route('posts.update', $post), [
+        'title' => 'Updated Title',
+        'text' => '',
+        'category_id' => $post->category_id,
+    ]);
+
+    expect($response)->assertSessionHasErrors('text')
+        ->and($response)->assertRedirect();
+
+    $post->refresh();
+    expect($post->title)->not()->toBe('Updated Title');
+});
+
+test('post update requires category_id', function () {
+    $admin = User::factory()->admin()->create();
+    $post = Post::factory()->create();
+
+    $this->actingAs($admin);
+
+    $response = $this->patch(route('posts.update', $post), [
+        'title' => 'Updated Title',
+        'text' => 'Updated Content',
+        'category_id' => '',
+    ]);
+
+    expect($response)->assertSessionHasErrors('category_id')
+        ->and($response)->assertRedirect();
+
+    $post->refresh();
+    expect($post->title)->not()->toBe('Updated Title')
+        ->and($post->text)->not()->toBe('Updated Content');
+});
+
+test('post update category_id must be an integer', function () {
+    $admin = User::factory()->admin()->create();
+    $post = Post::factory()->create();
+
+    $this->actingAs($admin);
+
+    $response = $this->patch(route('posts.update', $post), [
+        'title' => 'Updated Title',
+        'text' => 'Updated Content',
+        'category_id' => 'not-an-integer',
+    ]);
+
+    expect($response)->assertSessionHasErrors('category_id')
+        ->and($response)->assertRedirect();
+
+    $post->refresh();
+    expect($post->title)->not()->toBe('Updated Title')
+        ->and($post->text)->not()->toBe('Updated Content');
+});
+
+test('post update category_id must exist in categories table', function () {
+    $admin = User::factory()->admin()->create();
+    $post = Post::factory()->create();
+
+    $this->actingAs($admin);
+
+    $nonExistentCategoryId = 9999;
+
+    $response = $this->patch(route('posts.update', $post), [
+        'title' => 'Updated Title',
+        'text' => 'Updated Content',
+        'category_id' => $nonExistentCategoryId,
+    ]);
+
+    expect($response)->assertSessionHasErrors('category_id')
+        ->and($response)->assertRedirect();
+
+    $post->refresh();
+    expect($post->title)->not()->toBe('Updated Title')
+        ->and($post->text)->not()->toBe('Updated Content');
+});
